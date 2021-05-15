@@ -1,26 +1,92 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
 namespace ZipReader
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            string sourcePath = @"C:\Users\jakub\RiderProjects\AppNow\ZipReader\data\src.zip";
-            sourcePath = @"..\..\..\data\src.zip";
-            using (var archive = ZipFile.OpenRead(sourcePath))
+            //string sourcePath = @"C:\Users\jakub\Downloads\smerniceND.zip";
+            string sourcePath = @"..\..\..\data\src.zip";
+            
+            PrintArchive(sourcePath);
+            
+            Console.WriteLine();
+            
+            Menu(sourcePath);
+
+        }
+
+        private static void Menu(string sourcePath)
+        {
+            
+            Console.WriteLine("Press [R] to rename files or [E] to exit");
+            
+            ConsoleKey response;
+            do 
             {
-                foreach (var entry in archive.Entries)
+                response = Console.ReadKey(false).Key;
+            }   while (response != ConsoleKey.R
+                       && response != ConsoleKey.E);
+            switch (response)
+            {
+                case ConsoleKey.R:
+                    RenameFilesInArchive(sourcePath);
+                    break;
+                case ConsoleKey.E:
+                    break;
+            }
+        }
+
+        private static void RenameFilesInArchive(string sourcePath)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Renaming files started.");
+            Console.WriteLine();
+            
+            using (var archive = 
+                new ZipArchive(File.Open(sourcePath, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update))
+            {
+                var entries = archive.Entries.ToArray();
+                foreach (var entry in entries)
                 {
-                    var folderName = entry.FullName.Split('/');
-                    Console.WriteLine($"folder: {folderName[0]} | name: {entry.Name} | uncompressed size: {entry.Length} bytes");
+                    var oldEntryFullName = entry.FullName;
+                    var newEntryFullName = RenameEntry(entry.FullName);
+                    var newEntry = archive.CreateEntry(newEntryFullName);
+                    using (var a = entry.Open())
+                        using (var b = newEntry.Open())
+                            a.CopyTo(b);
+                    entry.Delete();
+                    Console.WriteLine($"originalFile: {oldEntryFullName} | newFile: {newEntryFullName}");
                 }
             }
-
             Console.WriteLine();
-            Console.WriteLine("Press 'E' to exit");
-            while (Console.ReadKey().Key != ConsoleKey.E) {}
+            Console.WriteLine("Renaming files completed.");
+            PrintArchive(sourcePath);
+        }
+        private static string RenameEntry(string entryFullName)
+        {
+            entryFullName = entryFullName
+                .Replace("d", "a")
+                .Replace("e", "b")
+                .Replace("f", "c");
+            return entryFullName;
+        }
+        private static void PrintArchive(string sourcePath)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Content of the archive:");
+            Console.WriteLine();
+            using var archive = ZipFile.OpenRead(sourcePath);
+            foreach (var entry in archive.Entries)
+            {
+                var folderName = entry.FullName.Split('/');
+                Console.WriteLine(
+                    $"folder: {folderName[0]} | name: {entry.Name} | uncompressed size: {entry.Length} bytes");
+            }
         }
     }
 }
