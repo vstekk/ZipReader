@@ -81,9 +81,7 @@ namespace ZipReader
                 .Replace("º", "ž")
                 .Replace("ª", "Ž")
                 .Replace("σ", "ň")
-                .Replace("Θ", "Ú")
-                .Replace("", "")
-                .Replace("", "");
+                .Replace("Θ", "Ú");
             
                 
             return entryFullName;
