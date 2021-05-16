@@ -9,8 +9,8 @@ namespace ZipReader
     {
         static void Main()
         {
-            //string sourcePath = @"C:\Users\jakub\Downloads\smerniceND.zip";
-            string sourcePath = @"..\..\..\data\src.zip";
+            string sourcePath = @"C:\Users\jakub\Downloads\směrnice ND.zip";
+            //string sourcePath = @"..\..\..\data\src.zip";
             
             PrintArchive(sourcePath);
             
@@ -70,9 +70,22 @@ namespace ZipReader
         private static string RenameEntry(string entryFullName)
         {
             entryFullName = entryFullName
-                .Replace("d", "a")
-                .Replace("e", "b")
-                .Replace("f", "c");
+                .Replace("²", "ř")
+                .Replace("ƒ", "č")
+                .Replace("∞", "ý")
+                .Replace("¼", "Č")
+                .Replace("à", "ů")
+                .Replace("╪", "ě")
+                .Replace("τ", "š")
+                .Replace("ⁿ", "Ř")
+                .Replace("º", "ž")
+                .Replace("ª", "Ž")
+                .Replace("σ", "ň")
+                .Replace("Θ", "Ú")
+                .Replace("", "")
+                .Replace("", "");
+            
+                
             return entryFullName;
         }
         private static void PrintArchive(string sourcePath)
